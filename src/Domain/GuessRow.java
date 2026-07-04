@@ -6,15 +6,18 @@ import java.util.List;
 public class GuessRow {
     private Tile[] tiles;
 
-
-    //een heel woord van een rij opvragen.
-    private void fullWordRow(){
-        //TDDO
-
+    public GuessRow(String guessedWord) {
+        this.tiles = new Tile[5];
+        // TODO: Loop door het 'guessedWord' heen en vul de array met 5 nieuwe Tile-objecten
     }
 
-    // om te checken of alle 5 de Tiles de status Correct hebben.
-    private void correctWord(){
-        //TDDO
+    public boolean isWinningGuess() {
+        // TODO: Check of alle 5 de vakjes de status 'CORRECT' hebben
+        return false;
+    }
+
+    public Tile[] getTiles() {
+        return tiles;
     }
 }
+

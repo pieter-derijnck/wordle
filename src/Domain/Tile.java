@@ -4,13 +4,13 @@ public class Tile {
     private char letter;
     private StatusLetter status;
 
+    public Tile(char letter) {
+        this.letter = letter;
+        this.status = StatusLetter.EMPTY; // Standaard is een vakje nog leeg/grijs
+    }
 
     public char getLetter() {
         return letter;
-    }
-
-    public void setLetter(char letter) {
-        this.letter = letter;
     }
 
     public StatusLetter getStatus() {
