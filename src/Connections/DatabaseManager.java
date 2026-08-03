@@ -1,6 +1,8 @@
 package Connections;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseManager {
 
@@ -82,5 +84,31 @@ public class DatabaseManager {
         } catch (SQLException e) {
             System.out.println("Database fout: " + e.getMessage());
         }
+    }
+
+    // Losstaande methode voor het ophalen van het leaderboard
+    public List<String[]> getLeaderboardData() {
+        List<String[]> lijst = new ArrayList<>();
+        String sql = "SELECT player_name, games_played, games_won, avg_guesses, fastest_win FROM player_stats ORDER BY games_won DESC, fastest_win ASC LIMIT 10";
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                String name = rs.getString("player_name");
+                String played = String.valueOf(rs.getInt("games_played"));
+                String won = String.valueOf(rs.getInt("games_won"));
+                String avg = String.format("%.2f", rs.getDouble("avg_guesses"));
+                int fastest = rs.getInt("fastest_win");
+                String fastStr = rs.wasNull() ? "-" : String.valueOf(fastest);
+
+                lijst.add(new String[]{name, played, won, avg, fastStr});
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Fout bij ophalen leaderboard: " + e.getMessage());
+        }
+        return lijst;
     }
 }

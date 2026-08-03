@@ -1,0 +1,28 @@
+.root-pane {
+    -fx-background-color: #121213;
+    -fx-padding: 30px;
+}
+
+.title-label {
+    -fx-font-size: 48px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-font-family: Arial;
+    -fx-padding: 0 0 20px 0;
+}
+
+.menu-button {
+    -fx-min-width: 220px;
+    -fx-min-height: 45px;
+    -fx-background-color: #538d4e;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-font-family: Arial;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+}
+
+.menu-button:hover {
+    -fx-background-color: #6aaa64;
+}

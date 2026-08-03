@@ -4,9 +4,7 @@ public class DomeinController {
 
     private WordleGame currentGame;
 
-    public DomeinController() {
-        // Nog geen database nodig voor we het spel werkend hebben!
-    }
+    public DomeinController() {}
 
     public void startNewGame() {
         this.currentGame = new WordleGame("src/Utils/words");
@@ -30,31 +28,6 @@ public class DomeinController {
         return currentGame != null ? currentGame.getTargetWord() : "";
     }
 
-    public String[] getBoardAsText() {
-        if (currentGame == null) return new String[0];
-
-        String[] output = new String[6];
-        GuessRow[] rows = currentGame.getBoard().getRows();
-
-        // Loop door de 6 rijen van het bord
-        for (int i = 0; i < 6; i++) {
-            if (rows[i] == null) {
-                // Deze rij is nog leeg
-                output[i] = "[ ] [ ] [ ] [ ] [ ]";
-            } else {
-                // Deze rij is ingevuld, bouw de tekst op
-                String rowText = "";
-                Tile[] tiles = rows[i].getTiles();
-                for (int j = 0; j < 5; j++) {
-                    // Zet de letter om naar hoofdletters voor de mooiste weergave
-                    char letter = Character.toUpperCase(tiles[j].getLetter());
-                    rowText += "[" + letter + ":" + tiles[j].getStatus() + "] ";
-                }
-                output[i] = rowText;
-            }
-        }
-        return output;
-    }
     public char[][] getBoardLetters() {
         char[][] letters = new char[6][5];
         GuessRow[] rows = currentGame.getBoard().getRows();
@@ -64,7 +37,7 @@ public class DomeinController {
                     letters[i][j] = Character.toUpperCase(rows[i].getTiles()[j].getLetter());
                 }
             } else {
-                for (int j = 0; j < 5; j++) letters[i][j] = ' '; // Leeg vakje
+                for (int j = 0; j < 5; j++) letters[i][j] = ' ';
             }
         }
         return letters;
@@ -76,7 +49,7 @@ public class DomeinController {
         for (int i = 0; i < 6; i++) {
             if (rows[i] != null) {
                 for (int j = 0; j < 5; j++) {
-                    statuses[i][j] = rows[i].getTiles()[j].getStatus().name(); // Dit geeft "CORRECT", "PRESENT", etc.
+                    statuses[i][j] = rows[i].getTiles()[j].getStatus().name();
                 }
             } else {
                 for (int j = 0; j < 5; j++) statuses[i][j] = "EMPTY";
@@ -84,5 +57,12 @@ public class DomeinController {
         }
         return statuses;
     }
+
+    // Roept de stabiele calculator gok op
+    public String getBesteCalculatorGok() {
+        if (currentGame == null) return "SLATE";
+        return currentGame.getBesteGok();
+    }
+
 
 }

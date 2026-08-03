@@ -1,5 +1,6 @@
 package Gui;
 
+import Connections.DatabaseManager;
 import Domain.DomeinController;
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -21,6 +22,9 @@ public class WordleGui extends Application {
     private Label messageLabel;
     private VBox root;
     private String huidigeInvoer = "";
+
+    // Nieuwe knop voor een nieuw spel
+    private Button newGameButton;
 
     // Houdt de virtuele toetsen bij zodat we de kleuren kunnen aanpassen
     private Map<String, Button> keyboardButtons = new HashMap<>();
@@ -60,12 +64,20 @@ public class WordleGui extends Application {
         tipButton.setStyle("-fx-background-color: #565758; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-family: Arial; -fx-padding: 8px 15px; -fx-background-radius: 4px; -fx-cursor: hand;");
         tipButton.setOnAction(e -> toonTipVenster());
 
-        // 3. Het virtuele toetsenbord
+        // 3. De Nieuw Spel knop (standaard verborgen)
+        newGameButton = new Button("Nieuw Spel");
+        newGameButton.setStyle("-fx-background-color: #538d4e; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-family: Arial; -fx-padding: 10px 20px; -fx-background-radius: 4px; -fx-cursor: hand;");
+        newGameButton.setVisible(false); // Onzichtbaar in het begin
+        newGameButton.setManaged(false); // Neemt geen ruimte in zolang hij onzichtbaar is
+        newGameButton.setOnAction(e -> resetSpel());
+
+        // 4. Het virtuele toetsenbord
         VBox keyboardPane = createKeyboard();
 
-        root.getChildren().addAll(title, grid, messageLabel, tipButton, keyboardPane);
+        // tipButton en newGameButton toegevoegd aan de root
+        root.getChildren().addAll(title, tipButton, grid, messageLabel, newGameButton, keyboardPane);
 
-        Scene scene = new Scene(root, 500, 800);
+        Scene scene = new Scene(root, 500, 850);
 
         // Luister naar fysiek toetsenbord
         scene.setOnKeyPressed(event -> handleKeyPress(event));
@@ -78,7 +90,6 @@ public class WordleGui extends Application {
         root.requestFocus();
     }
 
-    // Opent het pop-up venster voor de calculator/tips
     private void toonTipVenster() {
         Stage tipStage = new Stage();
         tipStage.setTitle("Wordle Calculator & Tips");
@@ -90,18 +101,35 @@ public class WordleGui extends Application {
         Label tipTitle = new Label("Slimme Calculator");
         tipTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white; -fx-font-family: Arial;");
 
-        Label adviesLabel = new Label("Beste statistische gok op dit moment:\n👉 [ Rekenalgoritme wordt gekoppeld ]");
-        adviesLabel.setStyle("-fx-font-size: 15px; -fx-text-fill: #538d4e; -fx-text-alignment: center; -fx-font-family: Arial;");
+        String besteGok = dc.getBesteCalculatorGok();
+
+        Label adviesLabel = new Label("Beste statistische gok op dit moment:\n👉 " + besteGok);
+        adviesLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #538d4e; -fx-text-alignment: center; -fx-font-family: Arial; -fx-font-weight: bold;");
 
         Button sluitBtn = new Button("Sluiten");
-        sluitBtn.setOnAction(e -> tipStage.close());
+        sluitBtn.setOnAction(e -> {
+            tipStage.close();
+            root.requestFocus(); // Zet de focus direct terug naar het hoofdspel
+        });
         sluitBtn.setStyle("-fx-background-color: #3a3a3c; -fx-text-fill: white; -fx-font-family: Arial; -fx-font-weight: bold; -fx-padding: 6px 12px; -fx-background-radius: 4px; -fx-cursor: hand;");
 
         tipLayout.getChildren().addAll(tipTitle, adviesLabel, sluitBtn);
 
-        Scene tipScene = new Scene(tipLayout, 350, 220);
+        Scene tipScene = new Scene(tipLayout, 380, 220);
+
+        // Zorg dat de enter-toets in het pop-up scherm niet het spel stoort
+        tipScene.setOnKeyPressed(event -> {
+            if (event.getCode().toString().equals("ENTER") || event.getCode().toString().equals("ESCAPE")) {
+                tipStage.close();
+                root.requestFocus();
+            }
+        });
+
         tipStage.setScene(tipScene);
         tipStage.show();
+
+        // Geef de focus terug aan het hoofdspel zodat je kunt blijven typen
+        root.requestFocus();
     }
 
     // Bouwt het virtuele toetsenbord met rijen
@@ -186,11 +214,8 @@ public class WordleGui extends Application {
 
                 huidigeInvoer = "";
 
-                if (dc.isGameWon()) {
-                    messageLabel.setText("Gefeliciteerd, je hebt gewonnen!");
-                    messageLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #538d4e; -fx-font-family: Arial; -fx-font-weight: bold;");
-                } else if (dc.isGameOver()) {
-                    messageLabel.setText("Game Over! Het woord was: " + dc.getTargetWord());
+                if (dc.isGameOver()) {
+                    handleGameOverState();
                 }
             } catch (IllegalArgumentException ex) {
                 messageLabel.setText(ex.getMessage());
@@ -203,6 +228,54 @@ public class WordleGui extends Application {
             messageLabel.setText("");
             updateHuidigeRijVisual();
         }
+    }
+
+    private void handleGameOverState() {
+        boolean gewonnen = dc.isGameWon();
+
+        // Bepaal hoeveel beurten er zijn gebruikt
+        int beurtenGebruikt = 0;
+        char[][] letters = dc.getBoardLetters();
+        for (int i = 0; i < 6; i++) {
+            if (letters[i][0] != ' ') {
+                beurtenGebruikt++;
+            }
+        }
+        if (!gewonnen && beurtenGebruikt == 0) beurtenGebruikt = 6;
+
+        // Toon melding op het scherm
+        if (gewonnen) {
+            messageLabel.setText("Gefeliciteerd, je hebt gewonnen!");
+            messageLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #538d4e; -fx-font-family: Arial; -fx-font-weight: bold;");
+        } else {
+            messageLabel.setText("Game Over! Het woord was: " + dc.getTargetWord());
+            messageLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #ff6b6b; -fx-font-family: Arial; -fx-font-weight: bold;");
+        }
+
+        // hier!
+        // Toon de nieuw spel knop
+        newGameButton.setVisible(true);
+        newGameButton.setManaged(true);
+    }
+
+    // Volledig nieuwe methode om het spel te resetten
+    private void resetSpel() {
+        dc.startNewGame();
+        huidigeInvoer = "";
+        messageLabel.setText("");
+        messageLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #ff6b6b; -fx-font-family: Arial; -fx-font-weight: bold;");
+
+        // Reset de knop zelf (terug verbergen)
+        newGameButton.setVisible(false);
+        newGameButton.setManaged(false);
+
+        // Reset toetsenbord kleuren terug naar standaard
+        for (Map.Entry<String, Button> entry : keyboardButtons.entrySet()) {
+            styleKeyboardButton(entry.getValue(), entry.getKey());
+        }
+
+        updateBoard();
+        root.requestFocus(); // Focus terug naar scherm om direct te kunnen typen
     }
 
     private void updateHuidigeRijVisual() {

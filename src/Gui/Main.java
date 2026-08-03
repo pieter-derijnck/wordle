@@ -1,10 +1,9 @@
-
-
 package Gui;
 
 public class Main {
+
     public static void main(String[] args) {
-        // Dit is de "veilige" manier om JavaFX op te starten in moderne Java versies!
+        // Start de applicatie via je WordleGui klasse
         WordleGui.main(args);
     }
 }
