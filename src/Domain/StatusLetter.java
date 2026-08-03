@@ -1,4 +1,7 @@
 package Domain;
 
-public enum StatusLetter { EMPTY,CORRECT,PRESENT,ABSENT
+
+
+public enum StatusLetter {
+    EMPTY, CORRECT, PRESENT, ABSENT
 }

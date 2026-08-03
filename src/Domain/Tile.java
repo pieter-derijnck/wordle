@@ -6,7 +6,7 @@ public class Tile {
 
     public Tile(char letter) {
         this.letter = letter;
-        this.status = StatusLetter.EMPTY; // Standaard is een vakje nog leeg/grijs
+        this.status = StatusLetter.EMPTY;
     }
 
     public char getLetter() {

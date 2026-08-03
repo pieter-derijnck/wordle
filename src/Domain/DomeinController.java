@@ -1,22 +1,17 @@
 package Domain;
 
-// import Connections.DatabaseManager; // Voor later!
-
 public class DomeinController {
 
     private WordleGame currentGame;
-    // private DatabaseManager dbManager; // Hier komt straks je repo/database!
 
     public DomeinController() {
-        // this.dbManager = new DatabaseManager();
+        // Nog geen database nodig voor we het spel werkend hebben!
     }
 
-    // De CUI roept dit aan om een potje te starten
     public void startNewGame() {
-        this.currentGame = new WordleGame();
+        this.currentGame = new WordleGame("src/Utils/words");
     }
 
-    // De CUI geeft de ingetypte letters door
     public void submitGuess(String guess) {
         if (currentGame != null) {
             currentGame.submitGuess(guess);
@@ -31,14 +26,63 @@ public class DomeinController {
         return currentGame != null && currentGame.isGameWon();
     }
 
-    // --- HIER KOMT DE MAGIE VOOR DE CUI ---
-    // In plaats van dat de CUI 'Board' en 'Tile' objecten moet importeren en begrijpen,
-    // geeft de DC gewoon kant-en-klare tekst (of arrays) terug die de CUI domweg kan printen.
+    public String getTargetWord() {
+        return currentGame != null ? currentGame.getTargetWord() : "";
+    }
 
     public String[] getBoardAsText() {
-        // TODO: Haal de rijen op uit currentGame.getBoard()
-        // en bouw ze om naar 6 Strings (bijvoorbeeld: "[A:CORRECT] [P:PRESENT] ...")
-        // Dan hoeft de CUI alleen maar System.out.println te doen op deze Strings!
-        return new String[6];
+        if (currentGame == null) return new String[0];
+
+        String[] output = new String[6];
+        GuessRow[] rows = currentGame.getBoard().getRows();
+
+        // Loop door de 6 rijen van het bord
+        for (int i = 0; i < 6; i++) {
+            if (rows[i] == null) {
+                // Deze rij is nog leeg
+                output[i] = "[ ] [ ] [ ] [ ] [ ]";
+            } else {
+                // Deze rij is ingevuld, bouw de tekst op
+                String rowText = "";
+                Tile[] tiles = rows[i].getTiles();
+                for (int j = 0; j < 5; j++) {
+                    // Zet de letter om naar hoofdletters voor de mooiste weergave
+                    char letter = Character.toUpperCase(tiles[j].getLetter());
+                    rowText += "[" + letter + ":" + tiles[j].getStatus() + "] ";
+                }
+                output[i] = rowText;
+            }
+        }
+        return output;
     }
+    public char[][] getBoardLetters() {
+        char[][] letters = new char[6][5];
+        GuessRow[] rows = currentGame.getBoard().getRows();
+        for (int i = 0; i < 6; i++) {
+            if (rows[i] != null) {
+                for (int j = 0; j < 5; j++) {
+                    letters[i][j] = Character.toUpperCase(rows[i].getTiles()[j].getLetter());
+                }
+            } else {
+                for (int j = 0; j < 5; j++) letters[i][j] = ' '; // Leeg vakje
+            }
+        }
+        return letters;
+    }
+
+    public String[][] getBoardStatuses() {
+        String[][] statuses = new String[6][5];
+        GuessRow[] rows = currentGame.getBoard().getRows();
+        for (int i = 0; i < 6; i++) {
+            if (rows[i] != null) {
+                for (int j = 0; j < 5; j++) {
+                    statuses[i][j] = rows[i].getTiles()[j].getStatus().name(); // Dit geeft "CORRECT", "PRESENT", etc.
+                }
+            } else {
+                for (int j = 0; j < 5; j++) statuses[i][j] = "EMPTY";
+            }
+        }
+        return statuses;
+    }
+
 }

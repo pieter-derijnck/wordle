@@ -1,7 +1,7 @@
 package Domain;
 
 public class WordleGame {
-    private static final String WORDS_FILE_PATH = "src/Utils/words.txt";
+    private static final String WORDS_FILE_PATH = "src/Utils/words";
     private Board board;
     private WordDictionary dictionary;
     private String targetWord;
@@ -21,10 +21,81 @@ public class WordleGame {
     }
 
     public void submitGuess(String guess) {
-        // TODO: 1. Valideer de gok via dictionary.isValidGuess()
-        // TODO: 2. Maak een nieuwe GuessRow aan
-        // TODO: 3. Vergelijk de letters met 'targetWord' en pas de LetterStatus van de Tiles aan
-        // TODO: 4. Voeg de rij toe aan het bord
-        // TODO: 5. Check of het spel gewonnen is, of dat de beurten op zijn (isGameOver)
+        guess = guess.toLowerCase();
+
+        valideerInput(guess);
+
+        GuessRow row = new GuessRow(guess);
+
+        evalueerLetters(row);
+
+
+        board.addGuess(row);
+
+        updateGameStatus(row);
     }
+
+    private void valideerInput(String guess) {
+        if (guess.length() != 5 || !dictionary.isValidGuess(guess)) {
+            throw new IllegalArgumentException("Ongeldig woord! Probeer een bestaand woord van 5 letters.");
+        }
+    }
+
+    private void updateGameStatus(GuessRow row) {
+        if (row.isWinningGuess()) {
+            isGameWon = true;
+            isGameOver = true;
+        } else if (board.isFull()) {
+            isGameOver = true;
+        }
+    }
+    private void evalueerLetters(GuessRow row) {
+        Tile[] tiles = row.getTiles();
+        boolean[] targetLetterGebruikt = new boolean[5];
+
+
+        for (int i = 0; i < 5; i++) {
+            if (tiles[i].getLetter() == targetWord.charAt(i)) {
+                tiles[i].setStatus(StatusLetter.CORRECT);
+                targetLetterGebruikt[i] = true;
+            }
+        }
+
+        for (int i = 0; i < 5; i++) {
+            if (tiles[i].getStatus() != StatusLetter.CORRECT) {
+                boolean letterGevonden = false;
+
+                for (int j = 0; j < 5; j++) {
+                    if (!targetLetterGebruikt[j] && tiles[i].getLetter() == targetWord.charAt(j)) {
+                        tiles[i].setStatus(StatusLetter.PRESENT);
+                        targetLetterGebruikt[j] = true;
+                        letterGevonden = true;
+                        break;
+                    }
+                }
+
+                if (!letterGevonden) {
+                    tiles[i].setStatus(StatusLetter.ABSENT);
+                }
+            }
+        }
+    }
+    public Board getBoard() {
+        return board;
+    }
+
+    public boolean isGameOver() {
+        return isGameOver;
+    }
+
+    public boolean isGameWon() {
+        return isGameWon;
+    }
+
+    public String getTargetWord() {
+        return targetWord;
+    }
+
+
+
 }

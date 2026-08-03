@@ -1,0 +1,47 @@
+.root-pane {
+    -fx-background-color: #121213; /* Donkere Wordle achtergrond */
+}
+
+.title {
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-font-family: "Arial";
+}
+
+.message {
+    -fx-font-size: 16px;
+    -fx-text-fill: #ff6b6b; /* Lichtrood voor foutmeldingen */
+    -fx-font-family: "Arial";
+    -fx-font-weight: bold;
+}
+
+/* De standaard layout voor een leeg vakje */
+.tile {
+    -fx-min-width: 60px;
+    -fx-min-height: 60px;
+    -fx-alignment: center;
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Arial";
+    -fx-text-fill: white;
+    -fx-border-color: #3a3a3c;
+    -fx-border-width: 2px;
+    -fx-background-color: transparent;
+}
+
+/* De statussen veranderen de achtergrond- en randkleur */
+.correct {
+    -fx-background-color: #538d4e;
+    -fx-border-color: #538d4e;
+}
+
+.present {
+    -fx-background-color: #b59f3b;
+    -fx-border-color: #b59f3b;
+}
+
+.absent {
+    -fx-background-color: #3a3a3c;
+    -fx-border-color: #3a3a3c;
+}

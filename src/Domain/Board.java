@@ -14,14 +14,20 @@ public class Board {
 
     public void addGuess(GuessRow row) {
         // TODO: Zet de nieuwe rij op de juiste plek in de array en verhoog de index
+        if(!isFull()) {
+           this.rows[currentRowIndex] = row;
+           currentRowIndex++;
+        }
     }
 
     public boolean isFull() {
         // TODO: Geef true terug als alle 6 de rijen vol zijn
-        return false;
+      return this.currentRowIndex >=6;
     }
 
     public GuessRow[] getRows() {
         return rows;
     }
+
+
 }
